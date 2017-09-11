@@ -10,7 +10,7 @@ public class HttpServer {
    * WEB_ROOT是HTML和其它文件存放的目录. 这里的WEB_ROOT为工作目录下的webroot目录
    */
   public static final String WEB_ROOT = System.getProperty("user.dir") + File.separator + "webroot";
-  public static final String SERVERIP = "192.168.50.68";
+  public static final String SERVERIP = "127.0.0.1";
   public static final int PORT = 8088;
 
   // 关闭服务命令
