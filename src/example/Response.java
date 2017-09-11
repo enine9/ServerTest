@@ -44,10 +44,10 @@ public class Response {
                     byte[] newBytes = Util.byteSum(headerMessage,bytes);
                     output.write(newBytes, 0, newBytes.length);
                     ch = fis.read(bytes, 0, BUFFER_SIZE);
-                }
-                while (ch != -1) {
-                    output.write(bytes, 0, ch);
-                    ch = fis.read(bytes, 0, BUFFER_SIZE);
+                    while (ch != -1) {
+                        output.write(bytes, 0, ch);
+                        ch = fis.read(bytes, 0, BUFFER_SIZE);
+                    }
                 }
             } else {
                 // file not found
