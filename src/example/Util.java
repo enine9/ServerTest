@@ -19,6 +19,14 @@ public class Util {
         return c;
     }
 
+    public static String byteSum (String header,String value,String origin){
+        StringBuffer sb = new StringBuffer();
+        sb.append(origin);
+        sb.append(header + ": ");
+        sb.append(value + "\r\n");
+        return sb.toString();
+    }
+
     public static void scanPort (){
         for(int port=1;port<=65535;port++){
             try{
@@ -29,4 +37,12 @@ public class Util {
             }
         }
     }
+
+    //提示区添加文字
+    public static void addJTextArea (String s){
+        HttpServer.mainUiCopy.textArea1.append("\n\r" + s);
+        HttpServer.mainUiCopy.textArea1.setCaretPosition(HttpServer.mainUiCopy.textArea1.getDocument().getLength());
+    }
+
+
 }

@@ -6,6 +6,9 @@ import java.io.IOException;
 public class Request {
     private InputStream input;
     private String uri;
+    private String method;
+    private String suffix;
+    private String fileName;
 
     public Request(InputStream input) {
         this.input = input;
@@ -25,8 +28,9 @@ public class Request {
         for (int j = 0; j < i; j++) {
             request.append((char) buffer[j]);
         }
-        System.out.print(request.toString());
-        uri = parseUri(request.toString());
+        Util.addJTextArea(request.toString());
+//        System.out.print(request.toString());
+        parseAll(request.toString());
     }
     /*
      *
@@ -38,6 +42,13 @@ public class Request {
      * ...
      * 该函数目的就是为了获取/index.html字符串
      */
+    private void parseAll(String requestString){
+        uri = parseUri(requestString);
+        method = parseMethod(requestString);
+        suffix = parseSuffix(uri);
+        fileName = parseFilename(uri);
+    }
+
     private String parseUri(String requestString) {
         int index1, index2;
         index1 = requestString.indexOf(' ');
@@ -57,8 +68,41 @@ public class Request {
         return null;
     }
 
+    private String parseSuffix(String requestString) {//获取文件后缀
+        int index1, index2;
+        index1 = requestString.lastIndexOf('/');
+        if (index1 != -1) {
+            index2 = requestString.lastIndexOf('.');
+            if (index2 > index1)
+                return requestString.substring(index2 + 1, requestString.length());
+        }
+        return null;
+    }
+
+    private String parseFilename(String requestString) {//获取文件名
+        int index1, index2;
+        index1 = requestString.lastIndexOf('/');
+        if (index1 != -1) {
+            index2 = requestString.lastIndexOf('.');
+            if (index2 > index1)
+                return requestString.substring(index1 + 1, requestString.length());
+        }
+        return null;
+    }
+
     public String getUri() {
         return uri;
     }
 
+    public String getMethod() {
+        return method;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
 }

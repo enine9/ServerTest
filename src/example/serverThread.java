@@ -23,7 +23,8 @@ public class serverThread implements Runnable {
         // 创建Request对象并解析
         Request request = new Request(input);
         request.parse();
-        if (request.getUri().equals(HttpServer.SHUTDOWN_COMMAND)) {
+
+        if (request.getUri().equals(HttpServer.SHUTDOWN_COMMAND)) { //如果停止服务器的话结束
             HttpServer.closeServer = true;//接受关闭服务器指令
             try {
                 clientRequest.close();
@@ -31,10 +32,11 @@ public class serverThread implements Runnable {
                 e.printStackTrace();
             }
         }
-        if (HttpServer.closeServer !=true){
+        if (!HttpServer.closeServer){
             // 创建 Response 对象
             Response response = new Response(output);
             response.setRequest(request);
+
             try {
                 response.sendStaticResource();
             } catch (IOException e) {
@@ -47,7 +49,6 @@ public class serverThread implements Runnable {
                 System.out.println(e.getMessage());
             }
         }
-
     }
 
 }

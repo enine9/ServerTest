@@ -33,14 +33,25 @@ public class Response {
         FileInputStream fis = null;
         try {
 //            将web文件写入到OutputStream字节流中
+            request.getMethod();
+            String suffix = request.getSuffix();
             File file = new File(HttpServer.WEB_ROOT, request.getUri());
             if (file.exists()) { //如果访问路径存在
                 fis = new FileInputStream(file);
                 lenghtStream = fis.available();//最大获取2GB,File的length()方法可获取大于2GB大小，或者用java.nio
                 int ch = fis.read(bytes, 0, BUFFER_SIZE);
                 if (ch != -1){//添加header
-                    String headerMessage = "HTTP/1.1 200 OK\r\n" + "Content-Type: text/html; charset=UTF-8\r\n"
-                            + "Content-Length: "+ lenghtStream +"\r\n" + "Connection: keep-alive"+"\r\n" + "\r\n";
+                    String headerMessage = "HTTP/1.1 200 OK\r\n" ;
+                    headerMessage = Util.byteSum("Content-Type","text/html; charset=UTF-8",headerMessage);
+                    headerMessage = Util.byteSum("Content-Length",Integer.toString(lenghtStream),headerMessage);
+                    headerMessage = Util.byteSum("Connection","keep-alive",headerMessage);
+                    if (suffix.equals("rar") || suffix.equals("zip")){//添加下载文件头
+                        headerMessage = Util.byteSum("Content-Disposition","attachment; filename=\""
+                                + request.getFileName() + "\"",headerMessage);
+                    }
+                    //TODO:断点续传 Clien Range: bytes=0-800 //一般请求下载整个文件是bytes=0- 或不用这个头
+                    //TODO:断点续传 Server Content-Range: bytes 0-800/801 //801:文件总大小
+                    headerMessage = headerMessage + "\r\n"; //结尾要多一个空行
                     byte[] newBytes = Util.byteSum(headerMessage,bytes);
                     output.write(newBytes, 0, newBytes.length);
                     ch = fis.read(bytes, 0, BUFFER_SIZE);
@@ -48,6 +59,7 @@ public class Response {
                         output.write(bytes, 0, ch);
                         ch = fis.read(bytes, 0, BUFFER_SIZE);
                     }
+
                 }
             } else {
                 // file not found
