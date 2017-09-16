@@ -1,4 +1,6 @@
 package example;
+import example.db.sqlite;
+
 import javax.swing.*;
 import java.net.Socket;
 import java.net.ServerSocket;
@@ -15,7 +17,8 @@ public class HttpServer {
   public static  int PORT = 8088;
   public static JTextArea JTextAreaCopy;
   public static mainUi mainUiCopy;
-
+  public static ServerSocket serverSocket = null;
+  public static ListenThread listenThreadold;
 
   // 关闭服务命令
   public static final String SHUTDOWN_COMMAND = "/SHUTDOWN";
@@ -29,45 +32,53 @@ public class HttpServer {
 
   //初始化
   public void init(mainUi mainui){
+    closeServer = false;
     SERVERIP = mainui.serverIpTextField.getText();
     PORT =Integer.parseInt(mainui.portTextField.getText());
     Util.addJTextArea("WEB_ROOT: \n\r"+ WEB_ROOT + " Server: \n\r"+SERVERIP+":" + PORT);
+
+//    sqlite.init();
+  }
+
+  public static void shutdown(){
+    if (serverSocket != null ){
+      try {
+        serverSocket.close();
+//      socket.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    try {
+    if (listenThreadold.isAlive()){
+      listenThreadold.interrupt();
+        Thread.sleep(3000);
+      }
+      if (!listenThreadold.isInterrupted()){
+        Thread.sleep(5000);
+      }
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
   public void swait(mainUi mainui) {
-    ServerSocket serverSocket = null;
-    Thread receiveThread = null;
+    serverSocket = null;
     mainUiCopy = mainui; //获取Ui
     init(mainUiCopy);//初始化
 //    System.out.println("WEB_ROOT:"+ WEB_ROOT + "port:" + PORT);
     try {
       //服务器套接字对象
-      serverSocket = new ServerSocket(PORT, 10, InetAddress.getByName(SERVERIP));
+      serverSocket = new ServerSocket(PORT, 3, InetAddress.getByName(SERVERIP));
     } catch (IOException e) {
       e.printStackTrace();
       System.exit(1);
     }
-    // 循环等待一个请求
-    while (true) {
-      Socket socket = null;
-      try {
-        //等待连接，连接成功后，返回一个Socket对象
-        socket = serverSocket.accept();
-        if (closeServer) {
-          closeServer=false;
-          break;
-        }
-        receiveThread = new Thread(new serverThread(socket));
-        receiveThread.start();
-        // 检查是否是关闭服务命令
-        if (closeServer) {
-          closeServer=false;
-          break;
-        }
-      } catch (Exception e) {
-        e.printStackTrace();
-        continue;
-      }
-    }
+
+    //创建监听线程
+    ListenThread listenThread = new ListenThread(serverSocket);
+    listenThreadold = listenThread;
+    listenThread.start();
+
   }
 }

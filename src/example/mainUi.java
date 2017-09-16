@@ -31,15 +31,10 @@ public class mainUi {
                     });
                     thread.start();
                 }else {
-                    runServerButton.setText("RunServer"); //关闭服务器
-                    HttpServer.closeServer=true;
+                    HttpServer.closeServer = true;
                     Util.addJTextArea("close ServerWeb");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
-
+                    HttpServer.shutdown();
+                    runServerButton.setText("RunServer"); //关闭服务器
                 }
 
             }
@@ -65,6 +60,14 @@ public class mainUi {
         mainui.textArea1.setWrapStyleWord(true); //换行不断字
         mainui.textArea1.setText("Hello World! \n\r 支持2G以内文件读取和简单http协议。\n\rweb目录为程序运行目录下的webroot。");
 
+//        test();
+
+    }
+
+    private static void test(){
+        String[] split = "name=lee&pass&age=32".split("\\&");
+        String[] split2 = split[1].split("\\=");
+        System.out.println(split);
     }
 
 }
